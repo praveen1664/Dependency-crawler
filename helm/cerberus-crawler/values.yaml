@@ -1,0 +1,40 @@
+# Default values for Dependency-crawler.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+job:
+  schedule: "0 0 * * SAT"
+
+image:
+  repository: Dependency-crawler
+  tag: local
+  pullPolicy: Never
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources:
+  limits:
+    cpu: 4
+    memory: 4Gi
+  requests:
+    cpu: 4
+    memory: 3Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

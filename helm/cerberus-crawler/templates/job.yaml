@@ -1,0 +1,56 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "Dependency-crawler.fullname" . }}
+  labels:
+    {{- include "Dependency-crawler.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.job.schedule | quote }}
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: {{ .Chart.Name }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+#              livenessProbe:
+#                exec:
+#                  command:
+#                    - echo
+#                    - "I'm alive"
+#              readinessProbe:
+#                exec:
+#                  command:
+#                    - echo
+#                    - "I'm alive"
+              securityContext:
+                runAsUser: 12345
+                capabilities:
+                  drop:
+                    - KILL
+                    - MKNOD
+                    - SYS_CHROOT
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              env:
+              - name: NUMBER_OF_PROCESSES
+                value: {{ .Values.numberOfProcesses | quote }}
+              - name: COSMOS_URI
+                value: {{ .Values.cosmosUri | quote }}
+              - name: COSMOS_PRIMARY_KEY
+                value: {{ .Values.cosmosKey | quote }}
+              - name: COSMOS_GRAPH_PRIMARY_KEY
+                value: {{ .Values.cosmosGraphKey | quote }}
+              - name: GITHUB_API_TOKEN
+                value: {{ .Values.githubToken | quote }}
+              - name: FORCE_SCAN
+                value: {{ .Values.forceScan | quote }}
+              - name: APP_INSIGHTS_CONNECTION_STRING
+                value: {{ .Values.appInsightsConnectionString | quote }}
+              command: ["python"]
+              args: ["Dependency.py"]
+          restartPolicy: Never

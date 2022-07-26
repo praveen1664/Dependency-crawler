@@ -1,0 +1,43 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: "Dependency-report"
+  labels:
+    {{- include "Dependency-crawler.labels" . | nindent 4 }}
+spec:
+  schedule: "0 0 * * MON"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - name: "Dependency-report"
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              securityContext:
+                runAsUser: 12345
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              env:
+              - name: NUMBER_OF_PROCESSES
+                value: {{ .Values.numberOfProcesses | quote }}
+              - name: COSMOS_URI
+                value: {{ .Values.cosmosUri | quote }}
+              - name: COSMOS_GRAPH_PRIMARY_KEY
+                value: {{ .Values.cosmosGraphKey | quote }}
+              - name: GITHUB_API_TOKEN
+                value: {{ .Values.githubToken | quote }}
+              - name: STORAGE_ACCOUNT_CONNECTION_STRING
+                value: {{ .Values.storageConnectionString | quote }}
+              - name: STORAGE_ACCOUNT_ACCESS_KEY
+                value: {{ .Values.storageAccessKey | quote }}
+              - name: SERVICEBUS_CONNECTION_STRING
+                value: {{ .Values.servicebusConnectionString | quote }}
+              - name: APP_INSIGHTS_CONNECTION_STRING
+                value: {{ .Values.appInsightsConnectionString | quote }}
+              command: ["python"]
+              args: ["report.py"]
+          restartPolicy: Never

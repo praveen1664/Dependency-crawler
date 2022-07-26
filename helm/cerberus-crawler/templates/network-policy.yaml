@@ -1,0 +1,14 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ include "Dependency-crawler.fullname" . }}
+  labels:
+    app: {{ include "Dependency-crawler.name" . }}
+    chart: {{ template "Dependency-crawler.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  podSelector: {}
+  egress:
+    - ports:
+        - port: 443
