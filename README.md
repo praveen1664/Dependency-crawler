@@ -1,6 +1,6 @@
 # README
 
-## Check your own repo's vitals.yaml file
+## Check your own repo's vital
 
 ### Running on a Mac
 
